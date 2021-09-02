@@ -23,16 +23,13 @@ import javax.validation.Valid;
 @ConfigurationProperties(prefix = "taco.orders")
 public class OrderController {
 
-    private int pageSize = 20;
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
+    private OrderProps props;
 
     private OrderRepository orderRepo;
 
-    public OrderController(OrderRepository orderRepo) {
+    public OrderController(OrderRepository orderRepo, OrderProps props) {
         this.orderRepo = orderRepo;
+        this.props = props;
     }
 
     @GetMapping("current")
@@ -80,7 +77,7 @@ public class OrderController {
 
     @GetMapping
     public String ordersForUser(@AuthenticationPrincipal User user, Model model) {
-        Pageable pageable = PageRequest.of(0, pageSize);
+        Pageable pageable = PageRequest.of(0, props.getPageSize());
         model.addAttribute("orders", orderRepo.findByUserOrderByPlacedAtDesc(user, pageable));
 
         return "orderList";
